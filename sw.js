@@ -2,9 +2,11 @@
 const VERSION = "atem-timer-88d8eb9a53";
 const FILES = ["./", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"];
 
-// Neue Fassung: alle Dateien auf dem Gerät speichern und sofort übernehmen
+// Neue Fassung: alle Dateien frisch vom Server holen (nicht aus dem Zwischenspeicher des Browsers,
+// GitHub erlaubt bis zu 10 Minuten), auf dem Gerät speichern und sofort übernehmen
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting()));
+  const fresh = FILES.map(file => new Request(file, { cache: "reload" }));
+  event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 // Alte Fassungen aufräumen, aber nur die eigenen: Unter derselben GitHub-Adresse liegen auch andere Apps
